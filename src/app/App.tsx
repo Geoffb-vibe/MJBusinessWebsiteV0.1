@@ -103,37 +103,47 @@ function ContactForm({ id, variant = "light" }: { id: string; variant?: "light" 
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAttempted(true);
-    setSubmitError(null);
-    const errs = validateForm(vals);
-    if (Object.keys(errs).length) {
-      setErrors(errs);
-      const firstKey = Object.keys(errs)[0];
-      document.getElementById(`${id}-${firstKey}`)?.focus();
-      return;
+  e.preventDefault();
+  setAttempted(true);
+  setSubmitError(null);
+
+  const errs = validateForm(vals);
+  if (Object.keys(errs).length) {
+    setErrors(errs);
+    const firstKey = Object.keys(errs)[0];
+    document.getElementById(`${id}-${firstKey}`)?.focus();
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      "https://script.google.com/macros/s/AKfycbzABXufzKEsyPUKWo0_S1FPNKgvIEEn-XZCkkBAuCeJSkpXQGye8mPVz2uymnZjR2wZDw/exec",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8",
+        },
+        body: JSON.stringify({
+          first_name: vals.first.trim(),
+          surname: vals.last.trim(),
+          business_name: vals.biz.trim(),
+          email_address: vals.email.trim(),
+          phone_number: vals.phone.trim(),
+        }),
+      }
+    );
+
+    // With text/plain, many GAS setups still return 200; if not, treat non-2xx as error
+    if (!res.ok) {
+      throw new Error(`Request failed: ${res.status}`);
     }
-    try {
-      const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbzABXufzKEsyPUKWo0_S1FPNKgvIEEn-XZCkkBAuCeJSkpXQGye8mPVz2uymnZjR2wZDw/exec",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            first_name: vals.first.trim(),
-            surname: vals.last.trim(),
-            business_name: vals.biz.trim(),
-            email_address: vals.email.trim(),
-            phone_number: vals.phone.trim(),
-          }),
-        }
-      );
-      if (!response.ok) throw new Error(`Request failed: ${response.status}`);
-      setDone(true);
-    } catch (error) {
-      console.error("Form submission failed:", error);
-      setSubmitError("Something went wrong. Please try again or email us at hello@moneyjar.ie");
-    }
-  };
+
+    setDone(true);
+  } catch (error) {
+    console.error("Form submission failed:", error);
+    setSubmitError("Something went wrong. Please try again or email us at hello@moneyjar.ie");
+  }
+};
 
   const baseField = f
     ? "w-full px-4 py-3 rounded-xl border-2 bg-white text-[#243638] text-sm placeholder:text-[#9BAAAA] focus:outline-none focus:ring-2 focus:ring-[#30DFBF] transition-all shadow-sm shadow-black/10"
