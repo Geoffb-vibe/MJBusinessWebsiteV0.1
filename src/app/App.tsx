@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useInView } from "motion/react";
 import {
-  Menu, X, ArrowRight, ChevronDown, CheckCircle2,
+  Menu, X, ArrowRight, ArrowLeft, ChevronDown, CheckCircle2,
   FileText, Zap, BarChart3, RefreshCw,
   Building2, GraduationCap, Home, Globe, Shield
 } from "lucide-react";
@@ -255,16 +255,428 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   );
 }
 
+// ─── Legal pages ─────────────────────────────────────────────────────────────
+type Page = "home" | "terms" | "privacy";
+
+function DocSection({ heading, children }: { heading: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-10 pb-10 border-b border-[#EAEBEA] last:border-b-0 last:mb-0 last:pb-0">
+      <h2 className="text-base font-bold text-[#243638] mb-3 tracking-tight">{heading}</h2>
+      <div className="text-sm text-[#646867] leading-relaxed space-y-3">{children}</div>
+    </div>
+  );
+}
+
+function LegalLayout({ title, subtitle, navigate, other, children }: {
+  title: string;
+  subtitle: string;
+  navigate: (p: Page) => void;
+  other: { label: string; page: Page };
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="min-h-screen bg-white text-[#242C2B]" style={{ fontFamily: "Inter, sans-serif" }}>
+      {/* Sticky nav */}
+      <header className="sticky top-0 z-50 bg-white border-b border-[#EAEBEA] shadow-sm shadow-black/4">
+        <div className="max-w-[1280px] mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
+          <button
+            onClick={() => navigate("home")}
+            aria-label="Money Jar Business home"
+            className="flex-shrink-0 focus-visible:outline-2 focus-visible:outline-[#30DFBF] rounded"
+          >
+            <LogoMJBizBlue className="h-7 w-auto" />
+          </button>
+          <div className="flex items-center gap-3 md:gap-5">
+            <button
+              onClick={() => navigate("home")}
+              className="flex items-center gap-1.5 text-sm font-medium text-[#646867] hover:text-[#243638] transition-colors focus-visible:outline-2 focus-visible:outline-[#30DFBF] rounded"
+            >
+              <ArrowLeft className="w-4 h-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Back to Money Jar Business</span>
+              <span className="sm:hidden">Back</span>
+            </button>
+            <a
+              href="https://business.moneyjar.world/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 rounded-xl text-sm font-semibold bg-[#243638] text-white hover:bg-[#30DFBF] hover:text-[#0F3C34] transition-all focus-visible:outline-2 focus-visible:outline-[#30DFBF]"
+            >
+              Login
+            </a>
+          </div>
+        </div>
+      </header>
+
+      {/* Page header */}
+      <div className="bg-[#243638] pt-14 pb-16">
+        <div className="max-w-[760px] mx-auto px-6 md:px-10">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#30DFBF] mb-4">Legal</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">{title}</h1>
+          <p className="text-sm text-white/50 mt-3">{subtitle}</p>
+        </div>
+      </div>
+
+      {/* Document body */}
+      <div className="max-w-[760px] mx-auto px-6 md:px-10 py-16">{children}</div>
+
+      {/* Cross-link */}
+      <div className="max-w-[760px] mx-auto px-6 md:px-10 pb-16">
+        <div className="rounded-2xl bg-[#F8F8F9] border border-[#EAEBEA] px-6 py-5 flex items-center justify-between gap-4">
+          <p className="text-sm text-[#646867]">
+            Also see our{" "}
+            <button
+              onClick={() => navigate(other.page)}
+              className="font-semibold text-[#243638] underline underline-offset-2 hover:text-[#30DFBF] transition-colors"
+            >
+              {other.label}
+            </button>
+          </p>
+          <button
+            onClick={() => navigate(other.page)}
+            className="flex-shrink-0 flex items-center gap-1.5 text-sm font-semibold text-[#243638] hover:text-[#30DFBF] transition-colors"
+          >
+            View <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-[#242C2B] text-white pt-10 pb-8">
+        <div className="max-w-[1280px] mx-auto px-6 md:px-10">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b border-white/8">
+            <div>
+              <LogoMJBizWhite className="h-7 w-auto mb-3 opacity-90" />
+              <p className="text-sm text-[#A4A8A7]">Money that moves organisations</p>
+            </div>
+            <nav className="flex flex-wrap gap-x-8 gap-y-2 text-sm text-[#A4A8A7]">
+              <button onClick={() => navigate("home")} className="hover:text-[#30DFBF] transition-colors focus-visible:outline-2 focus-visible:outline-[#30DFBF] rounded">Home</button>
+              <button onClick={() => navigate("terms")} className="hover:text-[#30DFBF] transition-colors focus-visible:outline-2 focus-visible:outline-[#30DFBF] rounded">Terms</button>
+              <button onClick={() => navigate("privacy")} className="hover:text-[#30DFBF] transition-colors focus-visible:outline-2 focus-visible:outline-[#30DFBF] rounded">Privacy</button>
+              <a href="https://business.moneyjar.world/" target="_blank" rel="noopener noreferrer" className="hover:text-[#30DFBF] transition-colors focus-visible:outline-2 focus-visible:outline-[#30DFBF] rounded">Login</a>
+            </nav>
+          </div>
+          <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-[#A4A8A7]">
+            <span>© Money Jar. All rights reserved.</span>
+            <span>Money Jar Business is operated in Ireland. Regulated financial services.</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function TermsPage({ navigate }: { navigate: (p: Page) => void }) {
+  return (
+    <LegalLayout
+      title="Terms & Conditions"
+      subtitle="Last updated: 1 June 2025"
+      navigate={navigate}
+      other={{ label: "Privacy Policy", page: "privacy" }}
+    >
+      <DocSection heading="1. Introduction">
+        <p>
+          These Terms and Conditions ("Terms") govern your access to and use of the Money Jar Business platform
+          and related payment services ("Services") operated by Money Jar Limited, a company registered in Ireland.
+          By registering for an account or using the Services you agree to be bound by these Terms.
+        </p>
+        <p>
+          If you are accessing the Services on behalf of a business entity, you represent that you have the authority
+          to bind that entity to these Terms. These Terms should be read alongside any separate commercial agency
+          agreement entered into with Money Jar.
+        </p>
+      </DocSection>
+
+      <DocSection heading="2. Eligibility and Registration">
+        <p>
+          The Services are available to business entities legally registered and operating within Ireland or other
+          approved European jurisdictions. Individual consumers may not register for a Money Jar Business account.
+        </p>
+        <p>
+          You must provide accurate, complete, and current information during registration and keep that information
+          up to date. Money Jar reserves the right to suspend or terminate accounts where information is found to
+          be inaccurate or misleading.
+        </p>
+        <p>
+          You are responsible for maintaining the confidentiality of your account credentials and for all activity
+          that occurs under your account.
+        </p>
+      </DocSection>
+
+      <DocSection heading="3. Description of Services">
+        <p>
+          Money Jar Business acts as a commercial agent on behalf of registered businesses to facilitate the collection
+          of payments from customers in Brazil. Customers pay in Brazilian Real (BRL) via Pix, the Brazilian instant
+          payment system. Money Jar converts the funds and transfers Euros (EUR) to your designated business account.
+        </p>
+        <p>
+          Services may include: payment request generation, invoice communication, currency conversion, EUR transfer,
+          and reporting. The specific scope of services is defined in your commercial agency agreement with Money Jar.
+        </p>
+        <p>
+          Money Jar does not guarantee the timing of any individual payment from your customers. Processing times
+          depend on factors including customer action, banking system availability, and regulatory checks.
+        </p>
+      </DocSection>
+
+      <DocSection heading="4. Fees and Charges">
+        <p>
+          There is no direct fee charged to your business for using the Money Jar Business platform. Money Jar's
+          service fee is included within the total amount payable by your customer and cannot exceed 2.5% of the
+          payment value under the agreed service terms.
+        </p>
+        <p>
+          The applicable exchange rate for each transaction will be confirmed at the time of payment. Money Jar
+          uses market rates and aims to provide competitive conversion terms.
+        </p>
+        <p>
+          Money Jar reserves the right to revise its fee structure with reasonable notice. Any changes to fees
+          will be communicated to you in writing at least 30 days in advance.
+        </p>
+      </DocSection>
+
+      <DocSection heading="5. Acceptable Use">
+        <p>
+          You agree to use the Services only for lawful business purposes. You must not use the Services in
+          connection with any unlawful activity, including but not limited to money laundering, fraud, or the
+          financing of terrorism.
+        </p>
+        <p>
+          You are responsible for ensuring that the payments you request through the platform are for genuine
+          commercial transactions and that your customers have consented to the payment process.
+        </p>
+        <p>
+          Money Jar reserves the right to refuse to process any transaction that it reasonably believes may
+          violate applicable laws or regulations.
+        </p>
+      </DocSection>
+
+      <DocSection heading="6. Data and Privacy">
+        <p>
+          The handling of personal data in connection with the Services is described in our Privacy Policy,
+          which forms part of these Terms. By using the Services you acknowledge that you have read and
+          understood the Privacy Policy.
+        </p>
+        <p>
+          Where you share personal data about your customers with Money Jar for the purposes of payment
+          processing, you warrant that you have the necessary consent or legal basis to do so.
+        </p>
+      </DocSection>
+
+      <DocSection heading="7. Intellectual Property">
+        <p>
+          All intellectual property rights in the Money Jar Business platform, including software, content,
+          trademarks, and branding, are owned by or licensed to Money Jar Limited. You are granted a limited,
+          non-exclusive, non-transferable licence to use the platform solely for the purposes of accessing
+          the Services in accordance with these Terms.
+        </p>
+      </DocSection>
+
+      <DocSection heading="8. Limitation of Liability">
+        <p>
+          To the fullest extent permitted by applicable law, Money Jar shall not be liable for any indirect,
+          incidental, special, or consequential damages arising out of or in connection with your use of the
+          Services, including loss of revenue, loss of profits, or loss of data.
+        </p>
+        <p>
+          Money Jar's total liability to you for any claim arising in connection with these Terms shall not
+          exceed the total fees received by Money Jar in respect of the transaction or service giving rise
+          to the claim in the twelve months preceding the claim.
+        </p>
+      </DocSection>
+
+      <DocSection heading="9. Termination">
+        <p>
+          Either party may terminate the use of the Services by providing 30 days' written notice. Money Jar
+          may suspend or terminate your access immediately if you breach these Terms, if required to do so
+          by law or a regulator, or if Money Jar reasonably believes your account poses a risk of fraud or harm.
+        </p>
+        <p>
+          Upon termination, any outstanding payment obligations will continue to apply. Sections relating to
+          intellectual property, limitation of liability, and governing law will survive termination.
+        </p>
+      </DocSection>
+
+      <DocSection heading="10. Governing Law">
+        <p>
+          These Terms shall be governed by and construed in accordance with the laws of Ireland. Any dispute
+          arising under or in connection with these Terms shall be subject to the exclusive jurisdiction of
+          the courts of Ireland.
+        </p>
+        <p>
+          Nothing in these Terms affects your statutory rights as a business operating under applicable Irish
+          and EU law.
+        </p>
+      </DocSection>
+
+      <DocSection heading="11. Contact">
+        <p>
+          If you have any questions about these Terms, please contact us at{" "}
+          <a href="mailto:hello@moneyjar.ie" className="font-medium text-[#243638] underline underline-offset-2 hover:text-[#30DFBF] transition-colors">
+            hello@moneyjar.ie
+          </a>
+          {" "}or write to Money Jar Limited, Ireland.
+        </p>
+      </DocSection>
+    </LegalLayout>
+  );
+}
+
+function PrivacyPage({ navigate }: { navigate: (p: Page) => void }) {
+  return (
+    <LegalLayout
+      title="Privacy Policy"
+      subtitle="Last updated: 1 June 2025"
+      navigate={navigate}
+      other={{ label: "Terms & Conditions", page: "terms" }}
+    >
+      <DocSection heading="1. Introduction">
+        <p>
+          Money Jar Limited ("Money Jar", "we", "us") is committed to protecting the privacy of individuals
+          whose personal data we process. This Privacy Policy explains what data we collect, how we use it,
+          your rights, and how to contact us.
+        </p>
+        <p>
+          This Policy applies to visitors to our website, businesses that register for or use the Money Jar
+          Business platform, and the customers of those businesses whose payment data we process on their behalf.
+        </p>
+      </DocSection>
+
+      <DocSection heading="2. Information We Collect">
+        <p>We may collect and process the following categories of personal data:</p>
+        <ul className="list-disc list-inside space-y-1.5 pl-1">
+          <li><span className="font-medium text-[#243638]">Identity data</span> — name, job title, and business name of account holders.</li>
+          <li><span className="font-medium text-[#243638]">Contact data</span> — email address, phone number, and business address.</li>
+          <li><span className="font-medium text-[#243638]">Payment data</span> — transaction amounts, payment references, and currency conversion details.</li>
+          <li><span className="font-medium text-[#243638]">Technical data</span> — IP addresses, browser type, and usage data collected via cookies and analytics tools.</li>
+          <li><span className="font-medium text-[#243638]">Customer data</span> — personal data about your customers provided to us for the purpose of processing their payments.</li>
+        </ul>
+      </DocSection>
+
+      <DocSection heading="3. How We Use Your Information">
+        <p>We use personal data for the following purposes:</p>
+        <ul className="list-disc list-inside space-y-1.5 pl-1">
+          <li>Providing and managing the Money Jar Business platform and Services.</li>
+          <li>Processing and facilitating payment transactions on your behalf.</li>
+          <li>Verifying identity and complying with anti-money laundering obligations.</li>
+          <li>Communicating with you about your account, transactions, and service updates.</li>
+          <li>Improving and developing our platform through aggregated usage analysis.</li>
+          <li>Meeting our legal and regulatory obligations.</li>
+        </ul>
+      </DocSection>
+
+      <DocSection heading="4. Legal Basis for Processing">
+        <p>We process personal data on the following legal bases under the General Data Protection Regulation (GDPR):</p>
+        <ul className="list-disc list-inside space-y-1.5 pl-1">
+          <li><span className="font-medium text-[#243638]">Contract</span> — processing necessary to provide the Services under our agreement with you.</li>
+          <li><span className="font-medium text-[#243638]">Legal obligation</span> — compliance with anti-money laundering, tax, and other regulatory requirements.</li>
+          <li><span className="font-medium text-[#243638]">Legitimate interests</span> — improving and securing our Services, fraud prevention, and business communications.</li>
+          <li><span className="font-medium text-[#243638]">Consent</span> — where you have provided explicit consent, such as for marketing communications.</li>
+        </ul>
+      </DocSection>
+
+      <DocSection heading="5. Sharing Your Information">
+        <p>
+          We do not sell your personal data. We may share data with trusted third parties only where necessary
+          to deliver the Services, including:
+        </p>
+        <ul className="list-disc list-inside space-y-1.5 pl-1">
+          <li>Banking and payment partners involved in processing and converting transactions.</li>
+          <li>Identity verification and compliance service providers.</li>
+          <li>Cloud infrastructure and software providers who process data on our behalf under data processing agreements.</li>
+          <li>Regulatory or law enforcement authorities where required by law.</li>
+        </ul>
+        <p>
+          All third parties are required to handle your data in accordance with applicable data protection law
+          and our contractual instructions.
+        </p>
+      </DocSection>
+
+      <DocSection heading="6. International Transfers">
+        <p>
+          Given that the Services involve payment flows between Brazil and Europe, some personal data may be
+          transferred to or processed in countries outside the European Economic Area (EEA). Where such transfers
+          occur, we ensure appropriate safeguards are in place, such as the use of standard contractual clauses
+          approved by the European Commission.
+        </p>
+      </DocSection>
+
+      <DocSection heading="7. Data Retention">
+        <p>
+          We retain personal data for as long as necessary to fulfil the purposes for which it was collected,
+          including to satisfy legal, regulatory, and reporting obligations. Financial and transaction records
+          are typically retained for a minimum of seven years in accordance with Irish tax and company law.
+        </p>
+        <p>
+          Where data is no longer required, it is securely deleted or anonymised.
+        </p>
+      </DocSection>
+
+      <DocSection heading="8. Your Rights">
+        <p>Under GDPR, you have the following rights in relation to your personal data:</p>
+        <ul className="list-disc list-inside space-y-1.5 pl-1">
+          <li><span className="font-medium text-[#243638]">Access</span> — request a copy of the data we hold about you.</li>
+          <li><span className="font-medium text-[#243638]">Rectification</span> — ask us to correct inaccurate or incomplete data.</li>
+          <li><span className="font-medium text-[#243638]">Erasure</span> — request deletion of your data where we no longer have a legal basis to hold it.</li>
+          <li><span className="font-medium text-[#243638]">Restriction</span> — ask us to restrict processing in certain circumstances.</li>
+          <li><span className="font-medium text-[#243638]">Portability</span> — receive your data in a structured, machine-readable format.</li>
+          <li><span className="font-medium text-[#243638]">Objection</span> — object to processing based on legitimate interests.</li>
+        </ul>
+        <p>
+          To exercise any of these rights, email us at{" "}
+          <a href="mailto:hello@moneyjar.ie" className="font-medium text-[#243638] underline underline-offset-2 hover:text-[#30DFBF] transition-colors">
+            hello@moneyjar.ie
+          </a>
+          . We will respond within 30 days. You also have the right to lodge a complaint with the Data Protection Commission (DPC) in Ireland.
+        </p>
+      </DocSection>
+
+      <DocSection heading="9. Cookies">
+        <p>
+          Our website uses cookies and similar technologies to support essential site functionality, remember
+          your preferences, and analyse usage patterns. You can manage your cookie preferences through your
+          browser settings. Disabling certain cookies may affect the functionality of the platform.
+        </p>
+      </DocSection>
+
+      <DocSection heading="10. Changes to This Policy">
+        <p>
+          We may update this Privacy Policy from time to time. When we make material changes, we will notify
+          registered account holders by email and update the "Last updated" date at the top of this page.
+          We encourage you to review this Policy periodically.
+        </p>
+      </DocSection>
+
+      <DocSection heading="11. Contact">
+        <p>
+          For any questions, concerns, or to exercise your data rights, contact our team at{" "}
+          <a href="mailto:hello@moneyjar.ie" className="font-medium text-[#243638] underline underline-offset-2 hover:text-[#30DFBF] transition-colors">
+            hello@moneyjar.ie
+          </a>
+          {" "}or write to Money Jar Limited, Ireland.
+        </p>
+      </DocSection>
+    </LegalLayout>
+  );
+}
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 export default function App() {
+  const [page, setPage] = useState<Page>("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [page]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  if (page === "terms") return <TermsPage navigate={setPage} />;
+  if (page === "privacy") return <PrivacyPage navigate={setPage} />;
 
   const navLinks = [
     { label: "How it works", href: "#benefits" },
@@ -1193,14 +1605,14 @@ export default function App() {
                 Legal
               </div>
               <ul className="space-y-2.5 text-sm text-[#A4A8A7]">
-                {["Terms", "Privacy"].map((l) => (
+                {(["Terms", "Privacy"] as const).map((l) => (
                   <li key={l}>
-                    <a
-                      href="#"
+                    <button
+                      onClick={() => setPage(l.toLowerCase() as Page)}
                       className="hover:text-[#30DFBF] transition-colors focus-visible:outline-2 focus-visible:outline-[#30DFBF] rounded"
                     >
                       {l}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>
