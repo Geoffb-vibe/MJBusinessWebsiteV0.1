@@ -152,6 +152,7 @@ function HeroFlowCard() {
 
 // ─── Reusable contact form ────────────────────────────────────────────────────
 function ContactForm({ id, variant = "light" }: { id: string; variant?: "light" | "floating" }) {
+  const [submitted, setSubmitted] = useState(false);
   const isFloating = variant === "floating";
 
   const field = isFloating
@@ -162,13 +163,48 @@ function ContactForm({ id, variant = "light" }: { id: string; variant?: "light" 
     ? "block text-xs font-semibold text-white/90 mb-1.5 tracking-wide"
     : "block text-xs font-semibold text-[#646867] mb-1.5";
 
+  if (submitted) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="py-8 flex flex-col items-start gap-5"
+        role="status"
+        aria-live="polite"
+      >
+        <div className="w-12 h-12 rounded-2xl bg-[#30DFBF] flex items-center justify-center flex-shrink-0">
+          <CheckCircle2 className="w-6 h-6 text-[#0F3C34]" />
+        </div>
+        <div>
+          <p className={`text-lg font-bold mb-1 ${isFloating ? "text-white" : "text-[#243638]"}`}>
+            Request received
+          </p>
+          <p className={`text-sm leading-relaxed ${isFloating ? "text-white/60" : "text-[#646867]"}`}>
+            Thanks for getting in touch. A member of our team will be in contact within one business day.
+          </p>
+        </div>
+        <div className={`w-full h-px ${isFloating ? "bg-white/10" : "bg-[#EAEBEA]"}`} />
+        <p className={`text-xs ${isFloating ? "text-white/40" : "text-[#A4A8A7]"}`}>
+          In the meantime, if you have any questions email us at{" "}
+          <a
+            href="mailto:hello@moneyjar.ie"
+            className="underline underline-offset-2 hover:text-[#30DFBF] transition-colors"
+          >
+            hello@moneyjar.ie
+          </a>
+        </p>
+      </motion.div>
+    );
+  }
+
   return (
     <form
-      name="contact" 
-      method="POST" 
+      name="contact"
+      method="POST"
       data-netlify="true"
       id={id}
-      onSubmit={(e) => e.preventDefault()}
+      onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}
       className="space-y-3"
       aria-label="Request access"
       noValidate
