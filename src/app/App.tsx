@@ -73,97 +73,48 @@ function FadeIn({
   );
 }
 
-// ─── Ghost hero flow card — translucent, overlaid on hero image ───────────────
-function HeroFlowCard() {
-  return (
-    <div className="relative w-[252px] select-none" aria-hidden="true">
-      {/* Barely-there ambient bloom */}
-      <div className="absolute -inset-6 rounded-3xl bg-[#30DFBF]/5 blur-3xl pointer-events-none" />
+// ─── Contact form ─────────────────────────────────────────────────────────────
+type FormVals = { first: string; last: string; biz: string; email: string; phone: string };
+type FormErrors = Partial<FormVals>;
 
-      {/* Card — dark navy at ~65% opacity: readable over the dark image, visually recedes */}
-      <div className="relative bg-[#243638]/65 backdrop-blur-xl rounded-2xl border border-white/10 p-5">
-
-        {/* Live indicator */}
-        <div className="flex items-center gap-2 mb-5">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#30DFBF] animate-pulse flex-shrink-0" />
-          <span className="text-[11px] font-medium text-white/50 uppercase tracking-widest">
-            Payment flow
-          </span>
-        </div>
-
-        {/* BRL row */}
-        <div className="mb-1">
-          <div className="text-[11px] text-white/45 mb-1">Customer pays</div>
-          <div className="flex items-center gap-2.5">
-            <span className="text-lg leading-none">🇧🇷</span>
-            <span className="text-xl font-bold text-white tracking-tight">R$&nbsp;8.760</span>
-            <span className="ml-auto text-[10px] font-bold text-[#30DFBF] bg-[#30DFBF]/12 px-2 py-0.5 rounded-full border border-[#30DFBF]/20">
-              BRL
-            </span>
-          </div>
-        </div>
-
-        {/* Animated flow connector */}
-        <div className="flex items-center gap-2 my-3.5">
-          <div className="flex-1 h-px bg-white/10" />
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-1 h-1 rounded-full bg-[#30DFBF]/55"
-              animate={{ opacity: [0.2, 1, 0.2] }}
-              transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.28 }}
-            />
-          ))}
-          <span className="text-[10px] font-semibold text-[#30DFBF] whitespace-nowrap">
-            Money Jar
-          </span>
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-1 h-1 rounded-full bg-[#30DFBF]/55"
-              animate={{ opacity: [0.2, 1, 0.2] }}
-              transition={{ duration: 1.4, repeat: Infinity, delay: 0.7 + i * 0.28 }}
-            />
-          ))}
-          <div className="flex-1 h-px bg-white/10" />
-        </div>
-
-        {/* EUR row */}
-        <div className="mb-4">
-          <div className="text-[11px] text-[#83ECD9]/70 mb-1">Business receives</div>
-          <div className="flex items-center gap-2.5">
-            <span className="text-lg leading-none">🇮🇪</span>
-            <span className="text-xl font-bold text-[#30DFBF] tracking-tight">€&nbsp;1,500</span>
-            <span className="ml-auto text-[10px] font-bold text-[#30DFBF] bg-[#30DFBF]/12 px-2 py-0.5 rounded-full border border-[#30DFBF]/20">
-              EUR
-            </span>
-          </div>
-        </div>
-
-        {/* Rate footer — decorative, meets AA at these sizes over dark card */}
-        <div className="pt-3 border-t border-white/8 flex justify-between text-[10px] text-white/35">
-          <span>R$5.84 / EUR</span>
-          <span>Fee ≤ 2.5%</span>
-        </div>
-      </div>
-    </div>
-  );
+function validateForm(v: FormVals): FormErrors {
+  const e: FormErrors = {};
+  if (!v.first.trim()) e.first = "First name is required";
+  if (!v.last.trim()) e.last = "Surname is required";
+  if (!v.biz.trim()) e.biz = "Business name is required";
+  if (!v.email.trim()) e.email = "Email address is required";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) e.email = "Enter a valid email address";
+  if (!v.phone.trim()) e.phone = "Phone number is required";
+  return e;
 }
 
-// ─── Reusable contact form ────────────────────────────────────────────────────
 function ContactForm({ id, variant = "light" }: { id: string; variant?: "light" | "floating" }) {
-  const [submitted, setSubmitted] = useState(false);
-  const isFloating = variant === "floating";
+  const [done, setDone] = useState(false);
+  const [vals, setVals] = useState<FormVals>({ first: "", last: "", biz: "", email: "", phone: "" });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [attempted, setAttempted] = useState(false);
+  const f = variant === "floating";
 
-  const field = isFloating
-    ? "w-full px-4 py-3 rounded-xl border-2 border-white/30 bg-white text-[#243638] text-sm placeholder:text-[#9BAAAA] focus:outline-none focus:ring-2 focus:ring-[#30DFBF] focus:border-[#30DFBF] transition-all shadow-sm shadow-black/10"
-    : "w-full px-4 py-3 rounded-xl border border-[#EAEBEA] bg-white text-[#243638] text-sm placeholder:text-[#A4A8A7] focus:outline-none focus:ring-2 focus:ring-[#30DFBF] focus:border-transparent transition-all";
+  const set = (k: keyof FormVals) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const next = { ...vals, [k]: e.target.value };
+    setVals(next);
+    if (attempted) setErrors(validateForm(next));
+  };
 
-  const lbl = isFloating
-    ? "block text-xs font-semibold text-white/90 mb-1.5 tracking-wide"
-    : "block text-xs font-semibold text-[#646867] mb-1.5";
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAttempted(true);
+    const errs = validateForm(vals);
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      const firstKey = Object.keys(errs)[0];
+      document.getElementById(`${id}-${firstKey}`)?.focus();
+      return;
+    }
+    setDone(true);
+  };
 
-  if (submitted) {
+  if (done) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -173,24 +124,19 @@ function ContactForm({ id, variant = "light" }: { id: string; variant?: "light" 
         role="status"
         aria-live="polite"
       >
-        <div className="w-12 h-12 rounded-2xl bg-[#30DFBF] flex items-center justify-center flex-shrink-0">
+        <div className="w-12 h-12 rounded-2xl bg-[#30DFBF] flex items-center justify-center">
           <CheckCircle2 className="w-6 h-6 text-[#0F3C34]" />
         </div>
         <div>
-          <p className={`text-lg font-bold mb-1 ${isFloating ? "text-white" : "text-[#243638]"}`}>
-            Request received
-          </p>
-          <p className={`text-sm leading-relaxed ${isFloating ? "text-white/60" : "text-[#646867]"}`}>
+          <p className={`text-lg font-bold mb-1 ${f ? "text-white" : "text-[#243638]"}`}>Request received</p>
+          <p className={`text-sm leading-relaxed ${f ? "text-white/60" : "text-[#646867]"}`}>
             Thanks for getting in touch. A member of our team will be in contact within one business day.
           </p>
         </div>
-        <div className={`w-full h-px ${isFloating ? "bg-white/10" : "bg-[#EAEBEA]"}`} />
-        <p className={`text-xs ${isFloating ? "text-white/40" : "text-[#A4A8A7]"}`}>
-          In the meantime, if you have any questions email us at{" "}
-          <a
-            href="mailto:hello@moneyjar.ie"
-            className="underline underline-offset-2 hover:text-[#30DFBF] transition-colors"
-          >
+        <div className={`w-full h-px ${f ? "bg-white/10" : "bg-[#EAEBEA]"}`} />
+        <p className={`text-xs ${f ? "text-white/40" : "text-[#A4A8A7]"}`}>
+          In the meantime, email us at{" "}
+          <a href="mailto:hello@moneyjar.ie" className="underline underline-offset-2 hover:text-[#30DFBF] transition-colors">
             hello@moneyjar.ie
           </a>
         </p>
@@ -198,55 +144,69 @@ function ContactForm({ id, variant = "light" }: { id: string; variant?: "light" 
     );
   }
 
+  const baseField = f
+    ? "w-full px-4 py-3 rounded-xl border-2 bg-white text-[#243638] text-sm placeholder:text-[#9BAAAA] focus:outline-none focus:ring-2 focus:ring-[#30DFBF] transition-all shadow-sm shadow-black/10"
+    : "w-full px-4 py-3 rounded-xl border bg-white text-[#243638] text-sm placeholder:text-[#A4A8A7] focus:outline-none focus:ring-2 focus:ring-[#30DFBF] transition-all";
+
+  const fieldCls = (k: keyof FormVals) =>
+    `${baseField} ${errors[k] ? "border-red-400 focus:border-red-400" : f ? "border-white/30 focus:border-[#30DFBF]" : "border-[#EAEBEA] focus:border-transparent"}`;
+
+  const lbl = f
+    ? "block text-xs font-semibold text-white/90 mb-1.5 tracking-wide"
+    : "block text-xs font-semibold text-[#646867] mb-1.5";
+
+  const errMsg = (k: keyof FormVals) => errors[k] ? (
+    <p id={`${id}-${k}-err`} className={`mt-1.5 text-xs font-medium ${f ? "text-red-300" : "text-red-500"}`} role="alert">
+      {errors[k]}
+    </p>
+  ) : null;
+
+  const inputProps = (k: keyof FormVals) => ({
+    id: `${id}-${k}`,
+    value: vals[k],
+    onChange: set(k),
+    className: fieldCls(k),
+    "aria-invalid": !!errors[k] as boolean,
+    "aria-describedby": errors[k] ? `${id}-${k}-err` : undefined,
+  });
+
   return (
     <form
-      name="contact"
-      method="POST"
-      data-netlify="true"
-      id={id}
-      onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}
-      className="space-y-3"
-      aria-label="Request access"
-      noValidate
+      id={id} name="contact" method="POST" action="https://script.google.com/macros/s/AKfycbzABXufzKEsyPUKWo0_S1FPNKgvIEEn-XZCkkBAuCeJSkpXQGye8mPVz2uymnZjR2wZDw/exec"
+      onSubmit={handleSubmit}
+      className="space-y-3" aria-label="Request access" noValidate
     >
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label htmlFor={`${id}-first`} className={lbl}>First name</label>
-          <input id={`${id}-first`} type="text" autoComplete="given-name" placeholder="Jane" required className={field} />
+          <input {...inputProps("first")} type="text" autoComplete="given-name" placeholder="Jane" name="first_name" />
+          {errMsg("first")}
         </div>
         <div>
           <label htmlFor={`${id}-last`} className={lbl}>Surname</label>
-          <input id={`${id}-last`} type="text" autoComplete="family-name" placeholder="Smith" required className={field} />
+          <input {...inputProps("last")} type="text" autoComplete="family-name" placeholder="Smith" name="surname" />
+          {errMsg("last")}
         </div>
       </div>
       <div>
         <label htmlFor={`${id}-biz`} className={lbl}>Business name</label>
-        <input id={`${id}-biz`} type="text" autoComplete="organization" placeholder="Your organisation" required className={field} />
+        <input {...inputProps("biz")} type="text" autoComplete="organization" placeholder="Your organisation" name="business_name" />
+        {errMsg("biz")}
       </div>
       <div>
         <label htmlFor={`${id}-email`} className={lbl}>Email address</label>
-        <input id={`${id}-email`} type="email" autoComplete="email" placeholder="jane@business.com" required className={field} />
+        <input {...inputProps("email")} type="email" autoComplete="email" placeholder="jane@business.com" name="email_address" />
+        {errMsg("email")}
       </div>
       <div>
         <label htmlFor={`${id}-phone`} className={lbl}>Phone number</label>
-        <input id={`${id}-phone`} type="tel" autoComplete="tel" placeholder="+353 ..." className={field} />
+        <input {...inputProps("phone")} type="tel" autoComplete="tel" placeholder="+353 ..." name="phone_number" />
+        {errMsg("phone")}
       </div>
-      <button
-        type="submit"
-        className="w-full mt-1 py-3.5 bg-[#30DFBF] text-[#0F3C34] font-bold text-sm rounded-xl hover:bg-[#83ECD9] transition-all hover:shadow-lg hover:shadow-[#30DFBF]/20 focus-visible:outline-2 focus-visible:outline-white"
-      >
+      <button type="submit" className="w-full mt-1 py-3.5 bg-[#30DFBF] text-[#0F3C34] font-bold text-sm rounded-xl hover:bg-[#83ECD9] transition-all hover:shadow-lg hover:shadow-[#30DFBF]/20 focus-visible:outline-2 focus-visible:outline-white">
         Request Access →
       </button>
     </form>
-  );
-}
-
-// ─── Flow connector arrow ─────────────────────────────────────────────────────
-function FlowArrow() {
-  return (
-    <div className="flex items-center justify-center text-[#30DFBF] opacity-60 mx-2">
-      <ArrowRight className="w-5 h-5" />
-    </div>
   );
 }
 
