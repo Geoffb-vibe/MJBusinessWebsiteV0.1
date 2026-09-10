@@ -93,7 +93,6 @@ function ContactForm({ id, variant = "light" }: { id: string; variant?: "light" 
   const [vals, setVals] = useState<FormVals>({ first: "", last: "", biz: "", email: "", phone: "" });
   const [errors, setErrors] = useState<FormErrors>({});
   const [attempted, setAttempted] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const f = variant === "floating";
 
   const set = (k: keyof FormVals) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,48 +101,48 @@ function ContactForm({ id, variant = "light" }: { id: string; variant?: "light" 
     if (attempted) setErrors(validateForm(next));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setAttempted(true);
-  setSubmitError(null);
-
-  const errs = validateForm(vals);
-  if (Object.keys(errs).length) {
-    setErrors(errs);
-    const firstKey = Object.keys(errs)[0];
-    document.getElementById(`${id}-${firstKey}`)?.focus();
-    return;
-  }
-
-  try {
-    const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbzABXufzKEsyPUKWo0_S1FPNKgvIEEn-XZCkkBAuCeJSkpXQGye8mPVz2uymnZjR2wZDw/exec",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8",
-        },
-        body: JSON.stringify({
-          first_name: vals.first.trim(),
-          surname: vals.last.trim(),
-          business_name: vals.biz.trim(),
-          email_address: vals.email.trim(),
-          phone_number: vals.phone.trim(),
-        }),
-      }
-    );
-
-    // With text/plain, many GAS setups still return 200; if not, treat non-2xx as error
-    if (!res.ok) {
-      throw new Error(`Request failed: ${res.status}`);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAttempted(true);
+    const errs = validateForm(vals);
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      const firstKey = Object.keys(errs)[0];
+      document.getElementById(`${id}-${firstKey}`)?.focus();
+      return;
     }
-
     setDone(true);
-  } catch (error) {
-    console.error("Form submission failed:", error);
-    setSubmitError("Something went wrong. Please try again or email us at hello@moneyjar.ie");
+  };
+
+  if (done) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="py-8 flex flex-col items-start gap-5"
+        role="status"
+        aria-live="polite"
+      >
+        <div className="w-12 h-12 rounded-2xl bg-[#30DFBF] flex items-center justify-center">
+          <CheckCircle2 className="w-6 h-6 text-[#0F3C34]" />
+        </div>
+        <div>
+          <p className={`text-lg font-bold mb-1 ${f ? "text-white" : "text-[#243638]"}`}>Request received</p>
+          <p className={`text-sm leading-relaxed ${f ? "text-white/60" : "text-[#646867]"}`}>
+            Thanks for getting in touch. A member of our team will be in contact within one business day.
+          </p>
+        </div>
+        <div className={`w-full h-px ${f ? "bg-white/10" : "bg-[#EAEBEA]"}`} />
+        <p className={`text-xs ${f ? "text-white/40" : "text-[#A4A8A7]"}`}>
+          In the meantime, email us at{" "}
+          <a href="mailto:hello@moneyjar.ie" className="underline underline-offset-2 hover:text-[#30DFBF] transition-colors">
+            hello@moneyjar.ie
+          </a>
+        </p>
+      </motion.div>
+    );
   }
-};
 
   const baseField = f
     ? "w-full px-4 py-3 rounded-xl border-2 bg-white text-[#243638] text-sm placeholder:text-[#9BAAAA] focus:outline-none focus:ring-2 focus:ring-[#30DFBF] transition-all shadow-sm shadow-black/10"
@@ -204,11 +203,6 @@ function ContactForm({ id, variant = "light" }: { id: string; variant?: "light" 
         <input {...inputProps("phone")} type="tel" autoComplete="tel" placeholder="+353 ..." name="phone_number" />
         {errMsg("phone")}
       </div>
-      {submitError && (
-  <p className={`text-sm font-medium ${f ? "text-red-300" : "text-red-500"}`} role="alert">
-    {submitError}
-  </p>
-)}
       <button type="submit" className="w-full mt-1 py-3.5 bg-[#30DFBF] text-[#0F3C34] font-bold text-sm rounded-xl hover:bg-[#83ECD9] transition-all hover:shadow-lg hover:shadow-[#30DFBF]/20 focus-visible:outline-2 focus-visible:outline-white">
         Request Access →
       </button>
@@ -1180,16 +1174,16 @@ export default function App() {
                 Contact
               </div>
               <ul className="space-y-2.5 text-sm text-[#A4A8A7]">
-                {["Request Access", "Login"].map((l) => (
-                  <li key={l}>
-                    <a
-                      href="#contact"
-                      className="hover:text-[#30DFBF] transition-colors focus-visible:outline-2 focus-visible:outline-[#30DFBF] rounded"
-                    >
-                      {l}
-                    </a>
-                  </li>
-                ))}
+                <li>
+                  <a href="#contact" className="hover:text-[#30DFBF] transition-colors focus-visible:outline-2 focus-visible:outline-[#30DFBF] rounded">
+                    Request Access
+                  </a>
+                </li>
+                <li>
+                  <a href="https://business.moneyjar.world/" target="_blank" rel="noopener noreferrer" className="hover:text-[#30DFBF] transition-colors focus-visible:outline-2 focus-visible:outline-[#30DFBF] rounded">
+                    Login
+                  </a>
+                </li>
               </ul>
             </div>
 
@@ -1199,7 +1193,7 @@ export default function App() {
                 Legal
               </div>
               <ul className="space-y-2.5 text-sm text-[#A4A8A7]">
-                {["Terms", "Privacy", "Legal / Regulatory"].map((l) => (
+                {["Terms", "Privacy"].map((l) => (
                   <li key={l}>
                     <a
                       href="#"
