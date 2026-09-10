@@ -164,6 +164,9 @@ function ContactForm({ id, variant = "light" }: { id: string; variant?: "light" 
 
   return (
     <form
+      name="contact" 
+      method="POST" 
+      data-netlify="true"
       id={id}
       onSubmit={(e) => e.preventDefault()}
       className="space-y-3"
