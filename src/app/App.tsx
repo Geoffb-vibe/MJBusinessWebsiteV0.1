@@ -8,6 +8,7 @@ import {
 import iconBlue from "../imports/MJ-Icon_Blue.svg";
 import iconGreen from "../imports/MJ-Icon_Green.svg";
 import heroImage from "../imports/GlobalFX.png";
+import personalMockup from "../imports/Iphone_Green___Card_Right_-_EN.png";
 
 // ─── Inline SVG logos (no external asset dependency) ─────────────────────────
 function LogoMJBizWhite({ className = "" }: { className?: string }) {
@@ -1533,6 +1534,64 @@ export default function App() {
                 <ContactForm id="contact-form" variant="floating" />
               </div>
             </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Personal Promo Panel ─────────────────────────────────────────── */}
+      <section className="bg-[#1A2E2F] overflow-hidden">
+        <div className="max-w-[1280px] mx-auto px-6 md:px-10">
+          <div className="grid md:grid-cols-2 gap-0 items-center">
+
+            {/* Text side */}
+            <FadeIn className="py-16 md:py-20 pr-0 md:pr-16">
+              <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full border border-[#30DFBF]/30 bg-[#30DFBF]/10">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#30DFBF]" />
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-[#30DFBF]">Money Jar Personal</span>
+              </div>
+
+              <h2 className="text-3xl md:text-4xl font-bold text-white leading-[1.15] mb-5 tracking-tight">
+                Help your customers arrive in Europe ready.
+              </h2>
+
+              <p className="text-[#8AADAB] leading-relaxed text-base mb-8 max-w-md">
+                Give your customers a financial head start. They can open an account from Brazil, convert funds to Euros at competitive rates, prepare proof of funds for visa applications and access their money when they arrive.
+              </p>
+
+              <a
+                href="https://www.moneyjar.world"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 text-[#30DFBF] font-semibold text-sm group transition-colors hover:text-white"
+              >
+                Discover Money Jar Personal Account
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#30DFBF]/15 group-hover:bg-[#30DFBF]/30 transition-colors">
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              </a>
+            </FadeIn>
+
+            {/* Image side */}
+            <div className="relative flex items-end justify-center md:justify-end pt-10 md:pt-0">
+              {/* Soft glow behind the mockup */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-72 h-72 rounded-full bg-[#30DFBF]/10 blur-3xl" />
+              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+                className="relative z-10 w-full max-w-[360px] md:max-w-[420px]"
+              >
+                <img
+                  src={personalMockup}
+                  alt="Money Jar Personal app on iPhone showing balance screen alongside a Money Jar debit card"
+                  className="w-full h-auto object-contain drop-shadow-2xl"
+                />
+              </motion.div>
+            </div>
+
           </div>
         </div>
       </section>
